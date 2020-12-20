@@ -19,12 +19,13 @@ public class StudentDao extends BaseDao {
         int result = 0;
         try {
             connection = DriverManager.getConnection(URL + EXTRA_PARAMETER, USERNAME, PASSWORD);
-            String sql = "insert into " + TABLE_NAME + "(id,name,gender,class) values(?,?,?,?)";
+            String sql = "insert into " + TABLE_NAME + "(id,name,gender,class, password) values(?,?,?,?,?)";
             preparedStatement = connection.prepareStatement(sql);
             preparedStatement.setInt(1, student.getId());
             preparedStatement.setString(2, student.getUsername());
             preparedStatement.setBoolean(3, student.isGender());
             preparedStatement.setString(4, student.getClassName());
+            preparedStatement.setString(5, student.getPassword());
             result = preparedStatement.executeUpdate();
             System.out.println(result);
         } catch (SQLException e) {

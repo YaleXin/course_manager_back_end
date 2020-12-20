@@ -10,6 +10,7 @@ import com.yalexin.dao.StudentDao;
 import com.yalexin.dao.TeacherDao;
 import com.yalexin.entity.Student;
 import com.yalexin.entity.Teacher;
+import com.yalexin.uitl.Md5UtilSimple;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -75,6 +76,8 @@ public class AddUserServlet extends HttpServlet {
 
         student.setId(data.getInteger("id"));
         student.setUsername(data.getString("username"));
+        // 默认密码是学号
+        student.setPassword(Md5UtilSimple.md5(String.valueOf(student.getId())));
         student.setClassName(data.getString("className"));
         student.setGender(data.getBoolean("gender"));
         int result = studentDao.addStudent(student);
