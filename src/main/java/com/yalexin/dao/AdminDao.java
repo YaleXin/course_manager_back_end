@@ -8,26 +8,18 @@ import com.yalexin.entity.AdminUser;
 
 import java.sql.*;
 
-public class AdminDao {
-    static String URL = "jdbc:mysql://localhost:3306/cs";
-    static String EXTRA_PARAMETER = "?serverTimezone=Asia/Shanghai&characterEncoding=utf8";
-    static String DRIVER_CLASS = "com.mysql.cj.jdbc.Driver";
-    static String TABLE_NAME = "admin_user";
-    static String USERNAME = "root";
-    static String PASSWORD = "12345678";
-    private Connection connection = null;
-    private PreparedStatement preparedStatement = null;
-    private ResultSet resultSet = null;
+public class AdminDao extends BaseDao{
+
     public AdminUser getAdminUserByUsername(String username) {
 
         if (username == null || username.trim().equals(""))return null;
         AdminUser adminUser = null;
         try {
-            connection = DriverManager.getConnection(URL + EXTRA_PARAMETER, USERNAME, PASSWORD);
+            this.connection = DriverManager.getConnection(URL + EXTRA_PARAMETER, USERNAME, PASSWORD);
             String sql = "select * from " + TABLE_NAME + " where username=?";
-            preparedStatement = connection.prepareStatement(sql);
+            this.preparedStatement = connection.prepareStatement(sql);
             preparedStatement.setString(1, username);
-            resultSet = preparedStatement.executeQuery();
+            this.resultSet = preparedStatement.executeQuery();
             System.out.println(preparedStatement.toString());
             if (resultSet.next()) adminUser = getOneAdminUserByResultSet(resultSet);
         } catch (SQLException sqlException) {
@@ -47,19 +39,6 @@ public class AdminDao {
     }
 
     public AdminDao() {
-        try {
-            Class.forName(DRIVER_CLASS);
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-    }
-    private void closeHelper() {
-        try {
-            if (resultSet != null) resultSet.close();
-            if (preparedStatement != null) preparedStatement.clearParameters();
-            if (connection != null) connection.close();
-        } catch (SQLException sqlException) {
-            sqlException.printStackTrace();
-        }
+        super("admin_user");
     }
 }
