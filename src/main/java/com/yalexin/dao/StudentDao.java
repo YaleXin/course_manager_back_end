@@ -65,6 +65,7 @@ public class StudentDao extends BaseDao {
             preparedStatement.setString(1, student.getPassword());
             preparedStatement.setInt(2, student.getId());
             updateResult  = preparedStatement.executeUpdate();
+            System.out.println(preparedStatement);
         } catch (SQLException sqlException) {
             sqlException.printStackTrace();
         }finally {
