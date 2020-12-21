@@ -7,6 +7,7 @@ package com.yalexin.dao;
 import com.yalexin.entity.Student;
 
 import java.sql.DriverManager;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class StudentDao extends BaseDao {
@@ -36,4 +37,38 @@ public class StudentDao extends BaseDao {
         }
 
     }
+
+    public Student getStudentById(int id) {
+        if (id <= 0) return null;
+        Student student = null;
+        try {
+            connection = DriverManager.getConnection(URL + EXTRA_PARAMETER, USERNAME, PASSWORD);
+            String sql = "select * from " + TABLE_NAME + " where id = ?";
+            preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setInt(1, id);
+            resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) student = getOneStudentByResultSet(resultSet);
+        } catch (SQLException sqlException) {
+            sqlException.printStackTrace();
+        } finally {
+            closeHelper();
+            return student;
+        }
+    }
+
+    private Student getOneStudentByResultSet(ResultSet resultSet) {
+        Student student = new Student();
+        try {
+            student.setId(resultSet.getInt("id"));
+            student.setUsername(resultSet.getString("name"));
+            student.setPassword(resultSet.getString("password"));
+            student.setClassName(resultSet.getString("class"));
+            student.setBirthday(resultSet.getDate("birthday"));
+            student.setGender(resultSet.getBoolean("gender"));
+        } catch (SQLException sqlException) {
+            sqlException.printStackTrace();
+        }
+        return student;
+    }
+
 }

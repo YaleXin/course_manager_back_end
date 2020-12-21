@@ -7,6 +7,7 @@ package com.yalexin.dao;
 import com.yalexin.entity.Teacher;
 
 import java.sql.DriverManager;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class TeacherDao extends BaseDao {
@@ -36,5 +37,36 @@ public class TeacherDao extends BaseDao {
         }
     }
 
+
+    public Teacher getTeacherById(int id) {
+        if (id <= 0) return null;
+        Teacher teacher = null;
+        try {
+            connection = DriverManager.getConnection(URL + EXTRA_PARAMETER, USERNAME, PASSWORD);
+            String sql = "select * from " + TABLE_NAME + " where id = ?";
+            preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setInt(1, id);
+            resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) teacher = getOneTeacherByResultSet(resultSet);
+        } catch (SQLException sqlException) {
+            sqlException.printStackTrace();
+        } finally {
+            closeHelper();
+            return teacher;
+        }
+    }
+
+    private Teacher getOneTeacherByResultSet(ResultSet resultSet) {
+        Teacher teacher = new Teacher();
+        try {
+            teacher.setId(resultSet.getInt("id"));
+            teacher.setUsername(resultSet.getString("name"));
+            teacher.setPassword(resultSet.getString("password"));
+            teacher.setGender(resultSet.getBoolean("gender"));
+        } catch (SQLException sqlException) {
+            sqlException.printStackTrace();
+        }
+        return teacher;
+    }
 
 }
