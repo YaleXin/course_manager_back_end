@@ -27,9 +27,13 @@ public class AddUserServlet extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String servletPath = req.getServletPath();
         System.out.println(servletPath);
-        if (servletPath.contains("/addStudent.admin"))addStudentPost(req, resp);
-        else if(servletPath.contains("/addTeacher.admin"))addTeacherPost(req, resp);
-        else if (servletPath.contains("/logout.admin"))req.getSession().removeAttribute("adminUser");
+        if (servletPath.contains("/addStudent.admin")) addStudentPost(req, resp);
+        else if (servletPath.contains("/addTeacher.admin")) addTeacherPost(req, resp);
+    }
+
+    @Override
+    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        if (req.getServletPath().contains("/logout.admin")) req.getSession().removeAttribute("adminUser");
     }
 
     private void addTeacherPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
@@ -48,6 +52,7 @@ public class AddUserServlet extends HttpServlet {
         Teacher teacher = new Teacher();
         teacher.setId(data.getInteger("id"));
         teacher.setUsername(data.getString("username"));
+        teacher.setPassword(Md5UtilSimple.md5(String.valueOf(teacher.getId())));
         teacher.setGender(data.getBoolean("gender"));
         int result = teacherDao.addTeacher(teacher);
         if (result > 0) {
@@ -67,7 +72,8 @@ public class AddUserServlet extends HttpServlet {
         JSONObject jsonObject = new JSONObject();
         BufferedReader reader = new BufferedReader(req.getReader());
         String json = reader.readLine();
-        System.out.println("json = " + json);;
+        System.out.println("json = " + json);
+        ;
         JSONObject jo = JSON.parseObject(json);
         JSONObject data = jo.getJSONObject("data").getJSONObject("student");
         System.out.println("data = " + data);

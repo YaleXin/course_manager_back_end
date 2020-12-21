@@ -31,7 +31,7 @@ public class AdminLoginServlet extends HttpServlet {
             Object user = req.getSession().getAttribute("adminUser");
             JSONObject jsonObject = new JSONObject();
             if (user != null) {
-                System.out.println("前端已登陆");
+                System.out.println("管理员前端已登陆");
                 AdminUser adminUser = (AdminUser) user;
                 adminUser.setPassword("");
                 jsonObject.put("logined", true);

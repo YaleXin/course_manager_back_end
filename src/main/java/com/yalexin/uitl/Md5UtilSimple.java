@@ -26,9 +26,11 @@ public class Md5UtilSimple {
     }
 
     public static void main(String[] args) {
-        String password = "admin";
+//        String password = "admin";
+        String password = "123";
         String md5HexStr = md5(password);
         System.out.println("==> MD5 加密前: " + password);
         System.out.println("==> MD5 加密后: " + md5HexStr);
+
     }
 }

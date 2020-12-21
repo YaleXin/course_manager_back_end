@@ -55,7 +55,23 @@ public class StudentDao extends BaseDao {
             return student;
         }
     }
-
+    public int updateStudent(Student student){
+        if (student == null || student.getId() <= 0)return 0;
+        int updateResult = 0;
+        try {
+            connection = DriverManager.getConnection(URL + EXTRA_PARAMETER, USERNAME, PASSWORD);
+            String sql = "update " + TABLE_NAME + " set password=? where id = ?";
+            preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setString(1, student.getPassword());
+            preparedStatement.setInt(2, student.getId());
+            updateResult  = preparedStatement.executeUpdate();
+        } catch (SQLException sqlException) {
+            sqlException.printStackTrace();
+        }finally {
+            closeHelper();
+            return updateResult;
+        }
+    }
     private Student getOneStudentByResultSet(ResultSet resultSet) {
         Student student = new Student();
         try {
