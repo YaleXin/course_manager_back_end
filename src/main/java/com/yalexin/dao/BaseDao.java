@@ -28,7 +28,9 @@ public class BaseDao {
             e.printStackTrace();
         }
     }
-
+    public String getTABLE_NAME(){
+        return this.TABLE_NAME;
+    }
     void closeHelper() {
         try {
             if (resultSet != null) resultSet.close();
