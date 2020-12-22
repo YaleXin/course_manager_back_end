@@ -23,7 +23,7 @@ public class Test {
 //        System.out.println(date);
 
 //        System.out.println(new Date((long )1575388800 * 1000));
-        System.out.println(new Date( 1575388800000l));
+//        System.out.println(new Date( ));
     }
     public static void timeTest(){
 //        Date date = new Date("2020-12-16T16:00:00.000Z");

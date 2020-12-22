@@ -21,14 +21,9 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.sql.Date;
 
-@WebServlet(urlPatterns = {"/modifyStudent.st", "/studentLogout"})
+@WebServlet(urlPatterns = {"/modifyStudent.st"})
 public class StudentServlet extends HttpServlet {
-    @Override
-    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        if (req.getServletPath().contains("/studentLogout")) {
-            req.getSession().removeAttribute("student");
-        }
-    }
+
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -40,6 +35,7 @@ public class StudentServlet extends HttpServlet {
 
     private void modiyfInfo(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         resp.setContentType("text/json; charset=utf-8");
+        System.out.println("--------  学生修改信息 ------");
         BufferedReader reader = req.getReader();
         String jsonString = reader.readLine();
         JSONObject jo = JSON.parseObject(jsonString);
@@ -47,7 +43,7 @@ public class StudentServlet extends HttpServlet {
         System.out.println("data = " + data);
 
         Integer id = data.getInteger("id");
-        Integer newBirthday = data.getInteger("birthday");
+        Long newBirthday = data.getLong("birthday");
         String oldPass_raw = data.getString("oldPass");
         String newPass_raw = data.getString("newPass");
 
@@ -64,7 +60,6 @@ public class StudentServlet extends HttpServlet {
             respData.put("updated", false);
             respData.put("error", "用户不存在");
         }else if (!studentById.getPassword().equals(md5_old)){
-
             respData.put("updated", false);
             respData.put("error", "原密码错误");
         }else  {
@@ -73,9 +68,11 @@ public class StudentServlet extends HttpServlet {
             int result = studentDao.updateStudent(studentById);
             if (result > 0){
                 respData.put("updated", true);
+                studentById.setPassword("");
+                session.setAttribute("student", studentById);
             }else {
                 respData.put("updated", false);
-                respData.put("error", "密码修改失败");
+                respData.put("error", "信息修改失败");
             }
         }
         resp.getWriter().println(respData);

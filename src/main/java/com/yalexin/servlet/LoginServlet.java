@@ -28,7 +28,7 @@ import java.io.PrintWriter;
 /**
  * 该类主要用于前端加密
  */
-@WebServlet(urlPatterns = {"/login", "/getUserSession"})
+@WebServlet(urlPatterns = {"/login", "/getUserSession", "/userLogout"})
 public class LoginServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -139,6 +139,14 @@ public class LoginServlet extends HttpServlet {
         System.out.println("教师请求登陆 返回的数据 :");
         System.out.println(respData);
         resp.getWriter().println(respData);
+    }
+
+    @Override
+    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        if (req.getServletPath().contains("/userLogout")){
+            req.getSession().removeAttribute("teacher");
+            req.getSession().removeAttribute("student");
+        }
     }
 
     void studentLogin(HttpServletRequest req, HttpServletResponse resp, JSONObject data) throws IOException {

@@ -60,10 +60,11 @@ public class StudentDao extends BaseDao {
         int updateResult = 0;
         try {
             connection = DriverManager.getConnection(URL + EXTRA_PARAMETER, USERNAME, PASSWORD);
-            String sql = "update " + TABLE_NAME + " set password=? where id = ?";
+            String sql = "update " + TABLE_NAME + " set password=?,birthday=? where id = ?";
             preparedStatement = connection.prepareStatement(sql);
             preparedStatement.setString(1, student.getPassword());
-            preparedStatement.setInt(2, student.getId());
+            preparedStatement.setDate(2,student.getBirthday());
+            preparedStatement.setInt(3, student.getId());
             updateResult  = preparedStatement.executeUpdate();
             System.out.println(preparedStatement);
         } catch (SQLException sqlException) {

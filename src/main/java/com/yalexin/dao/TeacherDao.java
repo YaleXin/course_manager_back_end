@@ -57,6 +57,26 @@ public class TeacherDao extends BaseDao {
         }
     }
 
+    public int updateTeacher(Teacher teacher) {
+        if (teacher == null || teacher.getId() <= 0)return 0;
+        int updateResult = 0;
+        try {
+            connection = DriverManager.getConnection(URL + EXTRA_PARAMETER, USERNAME, PASSWORD);
+            String sql = "update " + TABLE_NAME + " set password=? where id = ?";
+            preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setString(1, teacher.getPassword());
+            preparedStatement.setInt(2, teacher.getId());
+            updateResult  = preparedStatement.executeUpdate();
+            System.out.println(preparedStatement);
+        } catch (SQLException sqlException) {
+            sqlException.printStackTrace();
+        }finally {
+            closeHelper();
+            return updateResult;
+        }
+    }
+
+
     private Teacher getOneTeacherByResultSet(ResultSet resultSet) {
         Teacher teacher = new Teacher();
         try {
