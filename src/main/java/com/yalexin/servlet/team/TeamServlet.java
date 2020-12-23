@@ -5,6 +5,7 @@
 package com.yalexin.servlet.team;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.yalexin.dao.TeamDao;
 import com.yalexin.entity.Team;
@@ -17,7 +18,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.IOException;
 
-@WebServlet(urlPatterns = {"/getTeam.st"})
+@WebServlet(urlPatterns = {"/getTeam.st", "/addTeam.st"})
 public class TeamServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -25,6 +26,39 @@ public class TeamServlet extends HttpServlet {
         if (servletPath.contains("/getTeam")) {
             getTeamByStudent(req, resp);
         }
+    }
+
+    @Override
+    protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        String servletPath = req.getServletPath();
+        if (servletPath.contains("/addTeam.st")) {
+            addTeam(req, resp);
+        }
+    }
+
+    private void addTeam(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        BufferedReader reader = req.getReader();
+        String jsonString = reader.readLine();
+
+        JSONObject jo = JSON.parseObject(jsonString);
+        JSONObject data = jo.getJSONObject("data");
+        int captain = data.getIntValue("captain");
+        int subject = data.getIntValue("subject");
+        JSONArray jsonArray = data.getJSONArray("members");
+        int[] members = new int[jsonArray.size()];
+        for (int i = 0; i < jsonArray.size(); i++) {
+            Integer tem = (Integer) jsonArray.get(i);
+            members[i] = tem;
+        }
+        TeamDao teamDao = new TeamDao();
+        int result = teamDao.addTeadByCaptain(captain, members, subject);
+        JSONObject respData = new JSONObject();
+        if (result > 0) {
+            respData.put("addSuccess", true);
+        } else {
+            respData.put("addSuccess", false);
+        }
+        resp.getWriter().println(respData);
     }
 
     private void getTeamByStudent(HttpServletRequest req, HttpServletResponse resp) throws IOException {

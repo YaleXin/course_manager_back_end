@@ -22,11 +22,7 @@ public class CharsetFilter implements Filter {
         req.setCharacterEncoding("utf-8");
         HttpServletResponse resp = (HttpServletResponse) servletResponse;
         resp.setContentType("text/json; charset=utf-8");
-        System.out.println("qian=============");
         filterChain.doFilter(servletRequest, servletResponse);
-        System.out.println("hou=============");
-
-
     }
 
     @Override
