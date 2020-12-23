@@ -8,9 +8,11 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.yalexin.dao.StudentDao;
 import com.yalexin.dao.TeacherDao;
+import com.yalexin.dao.TeamDao;
 import com.yalexin.entity.Student;
 import com.yalexin.entity.Teacher;
 
+import com.yalexin.entity.Team;
 import com.yalexin.uitl.Md5UtilSimple;
 import com.yalexin.uitl.UserKey;
 
@@ -53,6 +55,15 @@ public class LoginServlet extends HttpServlet {
                 Student s = (Student) student;
                 respData.put("logined", true);
                 respData.put("user", s);
+
+                TeamDao teamDao = new TeamDao();
+                Team team = teamDao.getTeamByOneStudnet(s.getId());
+                if (team != null) {
+                    respData.put("hasTeam", true);
+                    respData.put("team", team);
+                }else {
+                    respData.put("hasTeam", false);
+                }
             }
             resp.getWriter().println(respData);
         }

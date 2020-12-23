@@ -5,6 +5,7 @@
 package com.yalexin.servlet.student;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.yalexin.dao.StudentDao;
 import com.yalexin.entity.Student;
@@ -20,8 +21,9 @@ import javax.servlet.http.HttpSession;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.sql.Date;
+import java.util.ArrayList;
 
-@WebServlet(urlPatterns = {"/modifyStudent.st"})
+@WebServlet(urlPatterns = {"/modifyStudent.st", "/getAllStudents.st"})
 public class StudentServlet extends HttpServlet {
 
 
@@ -31,6 +33,27 @@ public class StudentServlet extends HttpServlet {
         if (servletPath.contains("/modifyStudent.st")) {
             modiyfInfo(req, resp);
         }
+    }
+
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        String servletPath = req.getServletPath();
+        if (servletPath.contains("/getAllStudents.st")) {
+            getAllStudents(req, resp);
+        }
+    }
+
+    private void getAllStudents(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        JSONArray students = new JSONArray();
+        JSONObject respData = new JSONObject();
+        StudentDao studentDao = new StudentDao();
+        ArrayList<Student> allStudentsAsList = studentDao.getAllStudentsAsList();
+        for (Student s : allStudentsAsList) {
+            s.setPassword("");
+            students.add(s);
+        }
+        respData.put("students", students);
+        resp.getWriter().println(respData);
     }
 
     private void modiyfInfo(HttpServletRequest req, HttpServletResponse resp) throws IOException {
@@ -59,18 +82,18 @@ public class StudentServlet extends HttpServlet {
         if (studentById == null) {
             respData.put("updated", false);
             respData.put("error", "用户不存在");
-        }else if (!studentById.getPassword().equals(md5_old)){
+        } else if (!studentById.getPassword().equals(md5_old)) {
             respData.put("updated", false);
             respData.put("error", "原密码错误");
-        }else  {
+        } else {
             studentById.setBirthday(new Date(newBirthday));
             studentById.setPassword(md5_new);
             int result = studentDao.updateStudent(studentById);
-            if (result > 0){
+            if (result > 0) {
                 respData.put("updated", true);
                 studentById.setPassword("");
                 session.setAttribute("student", studentById);
-            }else {
+            } else {
                 respData.put("updated", false);
                 respData.put("error", "信息修改失败");
             }

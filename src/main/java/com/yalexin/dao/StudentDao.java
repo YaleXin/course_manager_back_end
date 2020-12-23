@@ -9,6 +9,7 @@ import com.yalexin.entity.Student;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 public class StudentDao extends BaseDao {
     public StudentDao() {
@@ -87,6 +88,23 @@ public class StudentDao extends BaseDao {
             sqlException.printStackTrace();
         }
         return student;
+    }
+
+    public ArrayList<Student> getAllStudentsAsList(){
+        ArrayList<Student> students = new ArrayList<>();
+        int updateResult = 0;
+        try {
+            connection = DriverManager.getConnection(URL + EXTRA_PARAMETER, USERNAME, PASSWORD);
+            String sql = "select * from " + TABLE_NAME ;
+            preparedStatement = connection.prepareStatement(sql);
+            resultSet = preparedStatement.executeQuery();
+            while (resultSet.next())students.add(getOneStudentByResultSet(resultSet));
+        } catch (SQLException sqlException) {
+            sqlException.printStackTrace();
+        }finally {
+            closeHelper();
+        }
+        return students;
     }
 
 }
