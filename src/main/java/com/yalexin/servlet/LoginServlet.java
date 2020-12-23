@@ -189,6 +189,15 @@ public class LoginServlet extends HttpServlet {
             JSONObject userParameter = new JSONObject();
             userParameter.put("role", "student");
             respData.put("userParameter", userParameter);
+
+            TeamDao teamDao = new TeamDao();
+            Team team = teamDao.getTeamByOneStudnet(studentById.getId());
+            if (team != null) {
+                respData.put("hasTeam", true);
+                respData.put("team", team);
+            }else {
+                respData.put("hasTeam", false);
+            }
         }
         System.out.println("学生请求登陆 返回的数据 :");
         System.out.println(respData);

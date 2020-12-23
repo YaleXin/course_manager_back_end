@@ -17,7 +17,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.IOException;
 
-@WebServlet(urlPatterns = {"/getTeam"})
+@WebServlet(urlPatterns = {"/getTeam.st"})
 public class TeamServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
