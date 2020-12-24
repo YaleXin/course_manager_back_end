@@ -30,9 +30,10 @@ public class progressUploadServlet extends HttpServlet {
 
         for (Part part :
                 parts) {
-
             String filename = getFilename(part);
-            part.write(filename);
+            if (filename != null) {
+                part.write(filename);
+            }
 
 
         }
