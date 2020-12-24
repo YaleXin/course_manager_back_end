@@ -25,6 +25,7 @@ import javax.servlet.http.HttpSession;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 
 
 /**
@@ -49,6 +50,10 @@ public class LoginServlet extends HttpServlet {
                     Teacher t = (Teacher) teacher;
                     respData.put("logined", true);
                     respData.put("user", t);
+
+                    TeamDao teamDao = new TeamDao();
+                    ArrayList<Team> teams = teamDao.getTeamsByTeacherId(t.getId());
+                    respData.put("notApprovedTeams", teams);
                 }
             } else {
                 System.out.println("学生已登陆");
@@ -143,6 +148,11 @@ public class LoginServlet extends HttpServlet {
             respData.put("user", teacherById);
             req.getSession().setAttribute("teacher", teacherById);
             req.getSession().removeAttribute("student");
+
+            TeamDao teamDao = new TeamDao();
+            ArrayList<Team> teams = teamDao.getTeamsByTeacherId(teacherById.getId());
+            respData.put("notApprovedTeams", teams);
+
             JSONObject userParameter = new JSONObject();
             userParameter.put("role", "teacher");
             respData.put("userParameter", userParameter);
