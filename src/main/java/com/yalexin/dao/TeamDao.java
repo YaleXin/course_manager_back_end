@@ -50,7 +50,6 @@ public class TeamDao extends BaseDao {
         team.setMem1_id(resultSet.getInt("member1"));
         team.setMem2_id(resultSet.getInt("member2"));
         team.setSu_id(resultSet.getInt("su_id"));
-        team.setSubName(resultSet.getString("subName"));
         if (team.getMem2_id() == 0) team.setFulled(false);
         else team.setFulled(true);
         return team;
@@ -124,7 +123,9 @@ public class TeamDao extends BaseDao {
             preparedStatement.setInt(1, teacherId);
             resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
+
                 Team team = getOneTeamByResultSet(resultSet);
+                team.setSubName(resultSet.getString("subName"));
                 setTeam(team);
                 teams.add(team);
             }
