@@ -5,11 +5,8 @@
 package com.yalexin.servlet.upload;
 
 import com.alibaba.fastjson.JSONObject;
-import com.yalexin.dao.TeacherDao;
-import com.yalexin.dao.TeamDao;
-import com.yalexin.dao.UploadDao;
+import com.yalexin.dao.ProgressDao;
 import com.yalexin.entity.Progress;
-import com.yalexin.entity.Team;
 import com.yalexin.uitl.Constants;
 import org.apache.commons.lang3.StringUtils;
 
@@ -20,7 +17,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Date;
@@ -47,7 +43,7 @@ public class UploadServlet extends HttpServlet {
         Collection<Part> parts = req.getParts();
         Date date = new Date();
         java.sql.Date date1 = new java.sql.Date(date.getTime());
-        UploadDao uploadDao = new UploadDao();
+        ProgressDao progressDao = new ProgressDao();
 //        TeamDao teamDao = new TeamDao();
 //        Team team = teamDao.getTeamByTeamId(Integer.parseInt(teamId));
         JSONObject respData = new JSONObject();
@@ -57,13 +53,14 @@ public class UploadServlet extends HttpServlet {
                 Progress progress = new Progress();
                 System.out.println("filename = " + filename);
                 String[] split = filename.split("\\.");
-                part.write(split[0] + "_" + date1.getTime() + "." + split[1]);
+                String fileName1 = split[0] + "_" + date1.getTime() + "." + split[1];
+                part.write(fileName1);
 
-                progress.setContent(Constants.FILE_PATH);
+                progress.setContent(fileName1);
                 progress.setStu_id(Integer.parseInt(studentId));
                 progress.setDate(date1);
                 progress.setTeam_id(teamId);
-                int result = uploadDao.addProgressByTeamId(teamId, progress);
+                int result = progressDao.addProgressByTeamId(teamId, progress);
                 if (result > 0) {
                     respData.put("upload", true);
                     break;
