@@ -76,24 +76,32 @@ public class TeamDao extends BaseDao {
     }
 
     public int addTeadByCaptain(int captainId, int[] members, int subject) {
+        for (int n : members) {
+            System.out.println(n);
+        }
         if (captainId <= 0) return 0;
         int result = 0, mem1 = -1, mem2 = -1;
         if (members.length >= 1) mem1 = members[0];
         if (members.length >= 2) mem2 = members[1];
+        System.out.println("mem1: " + mem1 + " mem2 :" + mem2);
         try {
             connection = DriverManager.getConnection(URL + EXTRA_PARAMETER, USERNAME, PASSWORD);
             String sql = "";
-            if (mem1 == -1) {
+            if (mem1 == -1 && mem2 == -1) {
+                System.out.println("单人");
                 sql = "insert into " + TABLE_NAME + "(captain,su_id) values(?,?)";
+                preparedStatement = connection.prepareStatement(sql);
                 preparedStatement.setInt(1, captainId);
                 preparedStatement.setInt(2, subject);
-            } else if (mem2 == -1) {
+            } else if (mem2 == -1 /*&& mem1 != -1*/) {
+                System.out.println("两个人");
                 sql = "insert into " + TABLE_NAME + "(captain,member1, su_id) values(?,?,?)";
                 preparedStatement = connection.prepareStatement(sql);
                 preparedStatement.setInt(1, captainId);
                 preparedStatement.setInt(2, mem1);
                 preparedStatement.setInt(3, subject);
-            } else {
+            } else /*if(mem2 != -1 && mem1 != -1)*/{
+                System.out.println("三个人");
                 sql = "insert into " + TABLE_NAME + "(captain,member1,member2, su_id) values(?,?,?,?)";
                 preparedStatement = connection.prepareStatement(sql);
                 preparedStatement.setInt(1, captainId);
@@ -136,4 +144,41 @@ public class TeamDao extends BaseDao {
         }
         return teams;
     }
+
+    public int acceptTeamByTeamId(int teamId) {
+        if (teamId <= 0) return 0;
+        int result = 0;
+        try {
+            connection = DriverManager.getConnection(URL + EXTRA_PARAMETER, USERNAME, PASSWORD);
+            String sql = "update " + TABLE_NAME + " set approved=1 where id=?";
+            preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setInt(1, teamId);
+            result = preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            closeHelper();
+            return result;
+        }
+    }
+
+
+    public int rejectTeamByTeamId(int teamId) {
+        if (teamId <= 0) return 0;
+        int result = 0;
+        try {
+            connection = DriverManager.getConnection(URL + EXTRA_PARAMETER, USERNAME, PASSWORD);
+            String sql = "delete from " + TABLE_NAME + " where id=?";
+            preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setInt(1, teamId);
+            result = preparedStatement.executeUpdate();
+            System.out.println(preparedStatement);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            closeHelper();
+            return result;
+        }
+    }
+
 }

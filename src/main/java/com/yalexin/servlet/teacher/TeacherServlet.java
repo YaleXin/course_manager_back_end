@@ -23,7 +23,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.ArrayList;
 
-@WebServlet(urlPatterns = {"/modifyTeacher.te", "/getNotApprovedTeams.te"})
+@WebServlet(urlPatterns = {"/modifyTeacher.te", "/getNotApprovedTeams.te", "/rejectTeam.te", "/acceptTeam.te"})
 public class TeacherServlet extends HttpServlet {
 
 
@@ -32,9 +32,55 @@ public class TeacherServlet extends HttpServlet {
         String servletPath = req.getServletPath();
         if (servletPath.contains("/modifyTeacher.te")) {
             modiyfInfo(req, resp);
-        }else if (servletPath.contains("/getNotApprovedTeams.te")){
+        } else if (servletPath.contains("/getNotApprovedTeams.te")) {
             getNotApprovedTeams(req, resp, -1, null);
+        } else if(servletPath.contains("/acceptTeam.te")){
+            acceptTeam(req, resp);
         }
+    }
+
+    private void acceptTeam(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        BufferedReader reader = req.getReader();
+        String jsonString = reader.readLine();
+
+        JSONObject jo = JSON.parseObject(jsonString);
+        JSONObject data = jo.getJSONObject("data");
+        int teamId = data.getIntValue("teamId");
+        TeamDao teamDao = new TeamDao();
+        int result = teamDao.acceptTeamByTeamId(teamId);
+        JSONObject respData = new JSONObject();
+        if (result > 0) {
+            respData.put("success", true);
+        } else {
+            respData.put("success", false);
+        }
+        resp.getWriter().println(respData);
+    }
+
+    @Override
+    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        String servletPath = req.getServletPath();
+        if (servletPath.contains("/rejectTeam.te")) {
+            rejectTeam(req, resp);
+        }
+    }
+
+    private void rejectTeam(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        BufferedReader reader = req.getReader();
+        String jsonString = reader.readLine();
+        System.out.println("jsonString = " + jsonString);
+        JSONObject jo = JSON.parseObject(jsonString);
+        JSONObject data = jo.getJSONObject("data");
+        int teamId = data.getIntValue("teamId");
+        TeamDao teamDao = new TeamDao();
+        int result = teamDao.rejectTeamByTeamId(teamId);
+        JSONObject respData = new JSONObject();
+        if (result > 0) {
+            respData.put("success", true);
+        } else {
+            respData.put("success", false);
+        }
+        resp.getWriter().println(respData);
     }
 
     private void getNotApprovedTeams(HttpServletRequest req, HttpServletResponse resp, int teacherId1, JSONObject respData1) throws IOException {
