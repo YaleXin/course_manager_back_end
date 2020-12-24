@@ -5,11 +5,13 @@
 package com.yalexin.dao;
 
 import com.yalexin.entity.Student;
+import com.yalexin.entity.Teacher;
 import com.yalexin.entity.Team;
 
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 public class TeamDao extends BaseDao {
 
@@ -48,6 +50,7 @@ public class TeamDao extends BaseDao {
         team.setMem1_id(resultSet.getInt("member1"));
         team.setMem2_id(resultSet.getInt("member2"));
         team.setSu_id(resultSet.getInt("su_id"));
+        team.setSubName(resultSet.getString("subName"));
         if (team.getMem2_id() == 0) team.setFulled(false);
         else team.setFulled(true);
         return team;
@@ -109,4 +112,27 @@ public class TeamDao extends BaseDao {
         }
     }
 
+
+    public ArrayList<Team> getTeamsByTeacherId(int teacherId) {
+        if (teacherId <= 0) return null;
+        ArrayList<Team> teams = new ArrayList<>();
+        try {
+            connection = DriverManager.getConnection(URL + EXTRA_PARAMETER, USERNAME, PASSWORD);
+//            String sql = "SELECT team.*,`subject`.`name` as subName from team,teacher,subject WHERE team.su_id=`subject`.id and `subject`.t_id=teacher.id and team.approved=0 and teacher.id=555;";
+            String sql = "SELECT team.*,`subject`.`name` as subName  from team,teacher,subject WHERE team.su_id=`subject`.id and `subject`.t_id=teacher.id and team.approved=0 and teacher.id=?";
+            preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setInt(1, teacherId);
+            resultSet = preparedStatement.executeQuery();
+            while (resultSet.next()) {
+                Team team = getOneTeamByResultSet(resultSet);
+                setTeam(team);
+                teams.add(team);
+            }
+        } catch (SQLException sqlException) {
+            sqlException.printStackTrace();
+        } finally {
+            closeHelper();
+        }
+        return teams;
+    }
 }

@@ -57,6 +57,8 @@ public class TeacherDao extends BaseDao {
         }
     }
 
+
+
     public int updateTeacher(Teacher teacher) {
         if (teacher == null || teacher.getId() <= 0)return 0;
         int updateResult = 0;

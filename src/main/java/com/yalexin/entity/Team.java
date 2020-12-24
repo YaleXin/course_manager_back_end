@@ -7,6 +7,7 @@ package com.yalexin.entity;
 public class Team {
     private int id;
     private boolean isFulled;
+    private boolean approved;
     private int cap_id;
     private int mem1_id;
     private int mem2_id;
@@ -14,6 +15,23 @@ public class Team {
     private String captain;
     private String member1;
     private String member2;
+    private String subName;
+
+    public boolean isApproved() {
+        return approved;
+    }
+
+    public void setApproved(boolean approved) {
+        this.approved = approved;
+    }
+
+    public String getSubName() {
+        return subName;
+    }
+
+    public void setSubName(String subName) {
+        this.subName = subName;
+    }
 
     public int getSu_id() {
         return su_id;

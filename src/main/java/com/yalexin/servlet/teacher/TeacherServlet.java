@@ -7,7 +7,9 @@ package com.yalexin.servlet.teacher;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.yalexin.dao.TeacherDao;
+import com.yalexin.dao.TeamDao;
 import com.yalexin.entity.Teacher;
+import com.yalexin.entity.Team;
 import com.yalexin.uitl.Md5UtilSimple;
 import com.yalexin.uitl.UserKey;
 
@@ -19,8 +21,9 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.util.ArrayList;
 
-@WebServlet(urlPatterns = {"/modifyTeacher.te"})
+@WebServlet(urlPatterns = {"/modifyTeacher.te", "/getNotApprovedTeams.te"})
 public class TeacherServlet extends HttpServlet {
 
 
@@ -29,7 +32,25 @@ public class TeacherServlet extends HttpServlet {
         String servletPath = req.getServletPath();
         if (servletPath.contains("/modifyTeacher.te")) {
             modiyfInfo(req, resp);
+        }else if (servletPath.contains("/getNotApprovedTeams.te")){
+            getNotApprovedTeams(req, resp, -1, null);
         }
+    }
+
+    private void getNotApprovedTeams(HttpServletRequest req, HttpServletResponse resp, int teacherId1, JSONObject respData1) throws IOException {
+        BufferedReader reader = req.getReader();
+        String jsonString = reader.readLine();
+
+        JSONObject jo = JSON.parseObject(jsonString);
+        JSONObject data = jo.getJSONObject("data");
+
+        int teacherId = data.getIntValue("teacherId");
+        TeamDao teamDao = new TeamDao();
+        ArrayList<Team> teams = teamDao.getTeamsByTeacherId(teacherId);
+
+        JSONObject respData = new JSONObject();
+        respData.put("notApprovedTeams", teams);
+        resp.getWriter().println(respData);
     }
 
     private void modiyfInfo(HttpServletRequest req, HttpServletResponse resp) throws IOException {
