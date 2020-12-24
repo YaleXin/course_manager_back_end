@@ -6,6 +6,8 @@ package com.yalexin.servlet.download;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.yalexin.dao.ProgressDao;
+import com.yalexin.entity.Progress;
 import com.yalexin.uitl.Constants;
 
 import javax.servlet.ServletException;
@@ -15,15 +17,33 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 
-@WebServlet(urlPatterns = "/download.te")
+@WebServlet(urlPatterns = {"/download.te", "/getAllProgresses.te"})
 public class DownloadServlet extends HttpServlet {
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String servletPath = req.getServletPath();
         if (servletPath.contains("/download.te")) {
             downloadProgress(req, resp);
+        }else if (servletPath.contains("/getAllProgresses.te")){
+            getAllProgresses(req, resp);
         }
+    }
+
+    private void getAllProgresses(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        BufferedReader reader = req.getReader();
+        String jsonString = reader.readLine();
+        System.out.println("jsonString = " + jsonString);
+        JSONObject jo = JSON.parseObject(jsonString);
+        JSONObject data = jo.getJSONObject("data");
+
+        int teacherId = data.getIntValue("teacherId");
+        ProgressDao progressDao = new ProgressDao();
+        ArrayList<Progress> progresses = progressDao.getAllTeamsProgressesByTeacherId(teacherId);
+        JSONObject respData = new JSONObject();
+        respData.put("progresses", progresses);
+        resp.getWriter().println(respData);
     }
 
     private void downloadProgress(HttpServletRequest req, HttpServletResponse resp) throws IOException {

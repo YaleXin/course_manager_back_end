@@ -8,6 +8,7 @@ import com.yalexin.entity.Progress;
 import com.yalexin.uitl.Constants;
 
 import java.sql.DriverManager;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
@@ -47,11 +48,37 @@ public class ProgressDao extends BaseDao{
 //       SELECT progress.* from progress,team WHERE progress.team_id=team.id and team.id in
 //       (SELECT team.id from team,`subject` WHERE team.su_id=`subject`.id and `subject`.id in
 //       (SELECT `subject`.id FROM `subject`,teacher WHERE teacher.id=1));
+
 //       SELECT progress.content,progress.date,student.`name` from progress,team,student WHERE progress.team_id=team.id and stu_id=student.id and team.id in
 //       (SELECT team.id from team,`subject` WHERE team.su_id=`subject`.id and `subject`.id in
 //       (SELECT `subject`.id FROM `subject`,teacher WHERE teacher.id=1));
        ArrayList<Progress> progresses = new ArrayList<>();
-       return null;
+       try {
+           connection = DriverManager.getConnection(URL + EXTRA_PARAMETER, USERNAME, PASSWORD);
+           String sql = "SELECT progress.content,progress.date,student.`name` from progress,team,student WHERE progress.team_id=team.id and stu_id=student.id and team.id in\n" +
+                   "       (SELECT team.id from team,`subject` WHERE team.su_id=`subject`.id and `subject`.id in\n" +
+                   "       (SELECT `subject`.id FROM `subject`,teacher WHERE teacher.id=?))";
+           preparedStatement = connection.prepareStatement(sql);
+           preparedStatement.setInt(1, teacherId);
+           resultSet = preparedStatement.executeQuery();
+           System.out.println("======== upload ========== preparedStatement = " + preparedStatement);
+           while (resultSet.next()){
+               progresses.add(getOneSimpleProgressByResult(resultSet));
+           }
+       } catch (SQLException e) {
+           e.printStackTrace();
+       } finally {
+           closeHelper();
+       }
+       return progresses;
    }
+
+    private Progress getOneSimpleProgressByResult(ResultSet resultSet) throws SQLException {
+        Progress progress = new Progress();
+        progress.setDate(resultSet.getDate("date"));
+        progress.setContent(resultSet.getString("content"));
+        progress.setUploader(resultSet.getString("name"));
+        return progress;
+    }
 
 }
