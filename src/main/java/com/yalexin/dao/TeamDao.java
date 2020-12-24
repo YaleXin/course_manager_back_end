@@ -181,4 +181,26 @@ public class TeamDao extends BaseDao {
         }
     }
 
+    public Team getTeamByTeamId(int teamId){
+        if (teamId <= 0)return null;
+        Team team = null;
+        try {
+            connection = DriverManager.getConnection(URL + EXTRA_PARAMETER, USERNAME, PASSWORD);
+            String sql = "select * from " + TABLE_NAME + " where id=?";
+            preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setInt(1, teamId);
+            resultSet = preparedStatement.executeQuery();
+            System.out.println("preparedStatement = " + preparedStatement);
+            if (resultSet.next()) team = getOneTeamByResultSet(resultSet);
+        } catch (SQLException sqlException) {
+            sqlException.printStackTrace();
+        } finally {
+            closeHelper();
+        }
+        if (team == null) return null;
+        if (team.getCap_id() == 0) return null;
+        setTeam(team);
+        return team;
+    }
+
 }

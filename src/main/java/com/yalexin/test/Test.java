@@ -13,6 +13,17 @@ import java.sql.Date;
 
 public class Test {
     public static void main(String[] args) {
+
+        String s = "进展跟进.docx";
+
+        String[] split = s.split("\\.");
+
+        System.out.println(split.length);
+        System.out.println(split[0]);
+        System.out.println(split[1]);
+
+        System.out.println("s.split(\".\") = " + s.split("."));
+        
 //        Student student = new Student();
 //        String hello = Md5UtilSimple.md5("hello");
 //        System.out.println(hello);
