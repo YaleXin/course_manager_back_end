@@ -54,6 +54,65 @@ public class TeamDao extends BaseDao {
         else team.setFulled(true);
         return team;
     }
+    // 返回已经批改的团队（已通过审核）
+    public ArrayList<Team> getTeamsWithScoreByTeacherId(int teacherId) {
+        if (teacherId <= 0) return null;
+        ArrayList<Team> teams = new ArrayList<>();
+        try {
+            connection = DriverManager.getConnection(URL + EXTRA_PARAMETER, USERNAME, PASSWORD);
+//            String sql = "SELECT team.*,`subject`.`name` as subName from team,teacher,subject WHERE team.su_id=`subject`.id and `subject`.t_id=teacher.id and team.approved=0 and teacher.id=555;";
+            String sql = "SELECT team.*,`subject`.`name` as subName  from team,teacher,subject WHERE team.su_id=`subject`.id and `subject`.t_id=teacher.id and team.approved=1 and team.score is NOT NULL and team.approved=1 and teacher.id=?";
+            preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setInt(1, teacherId);
+            resultSet = preparedStatement.executeQuery();
+            System.out.println("查询已批改的团队" + preparedStatement);
+            while (resultSet.next()) {
+                Team team = getOneTeamByResultSet(resultSet);
+                team.setSubName(resultSet.getString("subName"));
+                team.setScore(resultSet.getInt("score"));
+                setTeam(team);
+                teams.add(team);
+            }
+        } catch (SQLException sqlException) {
+            sqlException.printStackTrace();
+        } finally {
+            closeHelper();
+        }
+        System.out.println("已经批改的团队");
+        System.out.println(teams);
+        return teams;
+    }
+
+    // 返回待批改的团队（已通过审核）
+    public ArrayList<Team> getTeamsWithNullScoreByTeacherId(int teacherId) {
+        if (teacherId <= 0) return null;
+        ArrayList<Team> teams = new ArrayList<>();
+        try {
+            connection = DriverManager.getConnection(URL + EXTRA_PARAMETER, USERNAME, PASSWORD);
+//            String sql = "SELECT team.*,`subject`.`name` as subName from team,teacher,subject WHERE team.su_id=`subject`.id and `subject`.t_id=teacher.id and team.approved=0 and teacher.id=555;";
+            String sql = "SELECT team.*,`subject`.`name` as subName  from team,teacher,subject WHERE team.su_id=`subject`.id and `subject`.t_id=teacher.id and team.approved=1 and team.score is NULL and team.approved=1 and teacher.id=?";
+            preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setInt(1, teacherId);
+            resultSet = preparedStatement.executeQuery();
+            System.out.println("查询待批改的团队" + preparedStatement);
+
+            while (resultSet.next()) {
+                Team team = getOneTeamByResultSet(resultSet);
+                team.setSubName(resultSet.getString("subName"));
+                setTeam(team);
+                teams.add(team);
+            }
+        } catch (SQLException sqlException) {
+            sqlException.printStackTrace();
+        } finally {
+            closeHelper();
+        }
+        System.out.println("待批改的团队");
+        System.out.println(teams);
+        return teams;
+    }
+
+
 
     /**
      * 设置队员各个成员名
@@ -100,7 +159,7 @@ public class TeamDao extends BaseDao {
                 preparedStatement.setInt(1, captainId);
                 preparedStatement.setInt(2, mem1);
                 preparedStatement.setInt(3, subject);
-            } else /*if(mem2 != -1 && mem1 != -1)*/{
+            } else /*if(mem2 != -1 && mem1 != -1)*/ {
                 System.out.println("三个人");
                 sql = "insert into " + TABLE_NAME + "(captain,member1,member2, su_id) values(?,?,?,?)";
                 preparedStatement = connection.prepareStatement(sql);
@@ -181,8 +240,8 @@ public class TeamDao extends BaseDao {
         }
     }
 
-    public Team getTeamByTeamId(int teamId){
-        if (teamId <= 0)return null;
+    public Team getTeamByTeamId(int teamId) {
+        if (teamId <= 0) return null;
         Team team = null;
         try {
             connection = DriverManager.getConnection(URL + EXTRA_PARAMETER, USERNAME, PASSWORD);
@@ -201,6 +260,25 @@ public class TeamDao extends BaseDao {
         if (team.getCap_id() == 0) return null;
         setTeam(team);
         return team;
+    }
+
+    public int setTeamScoreByTeamId(int teamId, int score){
+        if (teamId <= 0) return 0;
+        int result = 0;
+        try {
+            connection = DriverManager.getConnection(URL + EXTRA_PARAMETER, USERNAME, PASSWORD);
+            String sql = "update " + TABLE_NAME + " set score=? where approved=1 and score is NULL and id=?";
+            preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setInt(1, score);
+            preparedStatement.setInt(2, teamId);
+            result = preparedStatement.executeUpdate();
+            System.out.println(preparedStatement);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            closeHelper();
+            return result;
+        }
     }
 
 }

@@ -12,6 +12,7 @@ public class Team {
     private int mem1_id;
     private int mem2_id;
     private int su_id;
+    private int score;
     private String captain;
     private String member1;
     private String member2;
@@ -19,6 +20,14 @@ public class Team {
 
     public boolean isApproved() {
         return approved;
+    }
+
+    public int getScore() {
+        return score;
+    }
+
+    public void setScore(int score) {
+        this.score = score;
     }
 
     public void setApproved(boolean approved) {

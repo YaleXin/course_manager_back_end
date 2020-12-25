@@ -23,7 +23,9 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.ArrayList;
 
-@WebServlet(urlPatterns = {"/modifyTeacher.te", "/getNotApprovedTeams.te", "/rejectTeam.te", "/acceptTeam.te"})
+@WebServlet(urlPatterns = {"/modifyTeacher.te", "/getNotApprovedTeams.te",
+        "/rejectTeam.te", "/acceptTeam.te", "/getHasNoScoreTeams.te",
+        "/getHasScoreTeams.te", "/setScore.te"})
 public class TeacherServlet extends HttpServlet {
 
 
@@ -34,9 +36,63 @@ public class TeacherServlet extends HttpServlet {
             modiyfInfo(req, resp);
         } else if (servletPath.contains("/getNotApprovedTeams.te")) {
             getNotApprovedTeams(req, resp, -1, null);
-        } else if(servletPath.contains("/acceptTeam.te")){
+        } else if (servletPath.contains("/acceptTeam.te")) {
             acceptTeam(req, resp);
+        } else if (servletPath.contains("/getHasNoScoreTeams.te")) {
+            getHasNoScoreTeams(req, resp);
+        } else if (servletPath.contains("/getHasScoreTeams.te")) {
+            getHasScore(req, resp);
+        }else if (servletPath.contains("/setScore.te")) {
+            setScore(req, resp);
         }
+    }
+
+    private void setScore(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        BufferedReader reader = req.getReader();
+        String jsonString = reader.readLine();
+        JSONObject jo = JSON.parseObject(jsonString);
+        JSONObject data = jo.getJSONObject("data");
+
+        int teamId = data.getIntValue("teamId");
+        int score = data.getIntValue("score");
+        TeamDao teamDao = new TeamDao();
+        int result = teamDao.setTeamScoreByTeamId(teamId, score);
+        JSONObject respData = new JSONObject();
+        if (result > 0 ){
+            respData.put("setScore", true);
+        }else{
+            respData.put("setScore", false);
+        }
+
+        resp.getWriter().println(respData);
+    }
+
+    private void getHasScore(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        BufferedReader reader = req.getReader();
+        String jsonString = reader.readLine();
+        JSONObject jo = JSON.parseObject(jsonString);
+        JSONObject data = jo.getJSONObject("data");
+
+        int teacherId = data.getIntValue("teacherId");
+        TeamDao teamDao = new TeamDao();
+        ArrayList<Team> teams = teamDao.getTeamsWithScoreByTeacherId(teacherId);
+        JSONObject respData = new JSONObject();
+        respData.put("hasScoreTeams", teams);
+        resp.getWriter().println(respData);
+    }
+
+    private void getHasNoScoreTeams(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        BufferedReader reader = req.getReader();
+        String jsonString = reader.readLine();
+        JSONObject jo = JSON.parseObject(jsonString);
+        JSONObject data = jo.getJSONObject("data");
+
+        int teacherId = data.getIntValue("teacherId");
+        TeamDao teamDao = new TeamDao();
+        ArrayList<Team> teams = teamDao.getTeamsWithNullScoreByTeacherId(teacherId);
+        JSONObject respData = new JSONObject();
+        respData.put("hasNoScoreTeams", teams);
+        resp.getWriter().println(respData);
     }
 
     private void acceptTeam(HttpServletRequest req, HttpServletResponse resp) throws IOException {
