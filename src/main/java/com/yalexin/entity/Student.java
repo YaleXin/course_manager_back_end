@@ -13,6 +13,7 @@ public class Student extends User {
     private String className;
 
     public Student() {
+        super("student");
     }
 
     public Student(String username, String password, int age, Date birthday, boolean gender, String className) {

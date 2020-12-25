@@ -16,10 +16,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 
-@WebServlet(urlPatterns = {"/download.te", "/getAllProgresses.te"})
+@WebServlet(urlPatterns = {"/download.te", "/getAllProgresses.te", "/getAllProgresses.st"})
 public class DownloadServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -27,11 +26,28 @@ public class DownloadServlet extends HttpServlet {
         if (servletPath.contains("/download.te")) {
             downloadProgress(req, resp);
         }else if (servletPath.contains("/getAllProgresses.te")){
-            getAllProgresses(req, resp);
+            getAllProgressesByTeacher(req, resp);
+        }else if(servletPath.contains("/getAllProgresses.st")){
+            getAllProgressesByTeamId(req, resp);
         }
     }
 
-    private void getAllProgresses(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+    private void getAllProgressesByTeamId(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        BufferedReader reader = req.getReader();
+        String jsonString = reader.readLine();
+        System.out.println("jsonString = " + jsonString);
+        JSONObject jo = JSON.parseObject(jsonString);
+        JSONObject data = jo.getJSONObject("data");
+
+        int teamId = data.getIntValue("teamId");
+        ProgressDao progressDao = new ProgressDao();
+        ArrayList<Progress> progresses = progressDao.getAllTeamsProgressesByTeamId(teamId);
+        JSONObject respData = new JSONObject();
+        respData.put("progresses", progresses);
+        resp.getWriter().println(respData);
+    }
+
+    private void getAllProgressesByTeacher(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         BufferedReader reader = req.getReader();
         String jsonString = reader.readLine();
         System.out.println("jsonString = " + jsonString);

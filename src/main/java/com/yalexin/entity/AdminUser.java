@@ -5,4 +5,7 @@
 package com.yalexin.entity;
 
 public class AdminUser extends User{
+    public AdminUser() {
+        super("admin");
+    }
 }

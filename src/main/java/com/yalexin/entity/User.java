@@ -10,7 +10,7 @@ public class User {
     private int id;
     private String username;
     private String password;
-
+    private String role;
     public int getId() {
         return id;
     }
@@ -48,6 +48,11 @@ public class User {
         this.password = password;
     }
 
-    public User() {
+    public User(String role) {
+        this.role = role;
+    }
+
+    public String getRole() {
+        return role;
     }
 }

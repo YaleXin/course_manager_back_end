@@ -57,11 +57,11 @@ public class ProgressDao extends BaseDao{
            connection = DriverManager.getConnection(URL + EXTRA_PARAMETER, USERNAME, PASSWORD);
            String sql = "SELECT progress.content,progress.date,student.`name` from progress,team,student WHERE progress.team_id=team.id and stu_id=student.id and team.id in\n" +
                    "       (SELECT team.id from team,`subject` WHERE team.su_id=`subject`.id and `subject`.id in\n" +
-                   "       (SELECT `subject`.id FROM `subject`,teacher WHERE teacher.id=?))";
+                   "       (SELECT `subject`.id FROM `subject`,teacher WHERE subject.t_id=teacher.id and teacher.id=?))";
            preparedStatement = connection.prepareStatement(sql);
            preparedStatement.setInt(1, teacherId);
            resultSet = preparedStatement.executeQuery();
-           System.out.println("======== upload ========== preparedStatement = " + preparedStatement);
+           System.out.println("========getAllTeamsProgressesByTeacherId ============= " + preparedStatement);
            while (resultSet.next()){
                progresses.add(getOneSimpleProgressByResult(resultSet));
            }
@@ -72,6 +72,26 @@ public class ProgressDao extends BaseDao{
        }
        return progresses;
    }
+
+    public ArrayList<Progress> getAllTeamsProgressesByTeamId(int teamId){
+        if (teamId <= 0)return null;
+        ArrayList<Progress> progresses = new ArrayList<>();
+        try {
+            connection = DriverManager.getConnection(URL + EXTRA_PARAMETER, USERNAME, PASSWORD);
+            String sql = "SELECT progress.date,progress.content,student.`name` FROM progress,student WHERE progress.stu_id=student.id and team_id=?";
+            preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setInt(1, teamId);
+            resultSet = preparedStatement.executeQuery();
+            while (resultSet.next()){
+                progresses.add(getOneSimpleProgressByResult(resultSet));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            closeHelper();
+        }
+        return progresses;
+    }
 
     private Progress getOneSimpleProgressByResult(ResultSet resultSet) throws SQLException {
         Progress progress = new Progress();
