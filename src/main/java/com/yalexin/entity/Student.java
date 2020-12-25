@@ -11,6 +11,28 @@ public class Student extends User {
     private Date birthday;
     private boolean gender;
     private String className;
+    private Team team;
+
+    @Override
+    public Team getTeam() {
+        return team;
+    }
+
+    @Override
+    public void setTeam(Team team) {
+        this.team = team;
+    }
+
+    @Override
+    public String toString() {
+        return "Student{" +
+                "age=" + age +
+                ", birthday=" + birthday +
+                ", gender=" + gender +
+                ", className='" + className + '\'' +
+                ", team=" + team +
+                '}';
+    }
 
     public Student() {
         super("student");

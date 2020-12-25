@@ -17,6 +17,23 @@ public class Team {
     private String member1;
     private String member2;
     private String subName;
+    private String subjectName;
+    private boolean scored;
+    public boolean isScored() {
+        return scored;
+    }
+
+    public void setScored(boolean scored) {
+        this.scored = scored;
+    }
+
+    public String getSubjectName() {
+        return subjectName;
+    }
+
+    public void setSubjectName(String subjectName) {
+        this.subjectName = subjectName;
+    }
 
     public boolean isApproved() {
         return approved;

@@ -34,11 +34,15 @@ public class TeamServlet extends HttpServlet {
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String servletPath = req.getServletPath();
         if (servletPath.contains("/addTeam.st")) {
-            addTeam(req, resp);
+            try {
+                addTeam(req, resp);
+            } catch (InterruptedException interruptedException) {
+                interruptedException.printStackTrace();
+            }
         }
     }
 
-    private void addTeam(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+    private void addTeam(HttpServletRequest req, HttpServletResponse resp) throws IOException, InterruptedException {
         BufferedReader reader = req.getReader();
         String jsonString = reader.readLine();
 
@@ -57,12 +61,16 @@ public class TeamServlet extends HttpServlet {
         JSONObject respData = new JSONObject();
         if (result > 0) {
             HttpSession session = req.getSession();
+            Thread.sleep(500);
             Team teamByCaptainId = teamDao.getTeamByCaptainId(captain);
+            System.out.println("teamByCaptainId = " + teamByCaptainId);
             Student student = (Student) session.getAttribute("student");
             student.setTeam(teamByCaptainId);
             if(teamByCaptainId != null){
+                System.out.println("-------------- teamByCaptainId != null ----------------");
                 session.removeAttribute("student");
                 session.setAttribute("student", student);
+                respData.put("team", teamByCaptainId);
             }
             respData.put("addSuccess", true);
         } else {

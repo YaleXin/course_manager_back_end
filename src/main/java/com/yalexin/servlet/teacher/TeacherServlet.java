@@ -8,6 +8,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.yalexin.dao.TeacherDao;
 import com.yalexin.dao.TeamDao;
+import com.yalexin.entity.Student;
 import com.yalexin.entity.Teacher;
 import com.yalexin.entity.Team;
 import com.yalexin.uitl.Md5UtilSimple;
@@ -50,6 +51,9 @@ public class TeacherServlet extends HttpServlet {
     private void setScore(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         BufferedReader reader = req.getReader();
         String jsonString = reader.readLine();
+
+        System.out.println("jsonString = " + jsonString);
+
         JSONObject jo = JSON.parseObject(jsonString);
         JSONObject data = jo.getJSONObject("data");
 
@@ -60,6 +64,12 @@ public class TeacherServlet extends HttpServlet {
         JSONObject respData = new JSONObject();
         if (result > 0 ){
             respData.put("setScore", true);
+            HttpSession session = req.getSession();
+            Student student = (Student) session.getAttribute("student");
+            session.removeAttribute("student");
+            student.getTeam().setScore(score);
+            student.getTeam().setScored(true);
+            session.setAttribute("student", student);
         }else{
             respData.put("setScore", false);
         }

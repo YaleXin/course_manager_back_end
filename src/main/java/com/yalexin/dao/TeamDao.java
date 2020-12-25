@@ -5,6 +5,7 @@
 package com.yalexin.dao;
 
 import com.yalexin.entity.Student;
+import com.yalexin.entity.Subject;
 import com.yalexin.entity.Teacher;
 import com.yalexin.entity.Team;
 
@@ -24,7 +25,7 @@ public class TeamDao extends BaseDao {
         Team team = null;
         try {
             connection = DriverManager.getConnection(URL + EXTRA_PARAMETER, USERNAME, PASSWORD);
-            String sql = "select * from " + TABLE_NAME + " where captain=? or member1=? or member2=? limit 1";
+            String sql = "select * from " + TABLE_NAME + " where captain=? or member1=? or member2=?";
             preparedStatement = connection.prepareStatement(sql);
             preparedStatement.setInt(1, id);
             preparedStatement.setInt(2, id);
@@ -50,6 +51,9 @@ public class TeamDao extends BaseDao {
         team.setMem1_id(resultSet.getInt("member1"));
         team.setMem2_id(resultSet.getInt("member2"));
         team.setSu_id(resultSet.getInt("su_id"));
+        team.setApproved(resultSet.getBoolean("approved"));
+        team.setScore(resultSet.getInt("score"));
+        team.setScored(team.getScore() > 0 );
         if (team.getMem2_id() == 0) team.setFulled(false);
         else team.setFulled(true);
         return team;
@@ -132,12 +136,12 @@ public class TeamDao extends BaseDao {
             Student mem2 = studentDao.getStudentById(team.getMem2_id());
             team.setMember2(mem2.getUsername());
         }
+        SubjectDao subjectDao = new SubjectDao();
+        Subject subjectById = subjectDao.getSubjectById(team.getSu_id());
+        team.setSubName(subjectById.getName());
     }
 
     public int addTeadByCaptain(int captainId, int[] members, int subject) {
-        for (int n : members) {
-            System.out.println(n);
-        }
         if (captainId <= 0) return 0;
         int result = 0, mem1 = -1, mem2 = -1;
         if (members.length >= 1) mem1 = members[0];
@@ -197,7 +201,7 @@ public class TeamDao extends BaseDao {
         }finally {
             closeHelper();
         }
-        return null;
+        return team;
     }
 
     public ArrayList<Team> getNotApprovedTeamsByTeacherId(int teacherId) {

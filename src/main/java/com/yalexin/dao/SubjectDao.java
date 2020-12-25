@@ -69,7 +69,7 @@ public class SubjectDao extends BaseDao {
             preparedStatement = connection.prepareStatement(sql);
             resultSet = preparedStatement.executeQuery();
             System.out.println(preparedStatement);
-            while (resultSet.next()) list.add(getOneSubjectByResultSet(resultSet));
+            while (resultSet.next()) list.add(getOneSubjectByResultSet(resultSet, true));
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
@@ -78,14 +78,16 @@ public class SubjectDao extends BaseDao {
         }
     }
 
-    private Subject getOneSubjectByResultSet(ResultSet resultSet) throws SQLException {
+    private Subject getOneSubjectByResultSet(ResultSet resultSet, boolean hasTeacherName) throws SQLException {
         Subject subject = new Subject();
         subject.setId(resultSet.getInt("id"));
         subject.setName(resultSet.getString("name"));
         subject.setDescription(resultSet.getString("description"));
         subject.setCategory(resultSet.getString("category"));
         subject.setT_id(resultSet.getInt("t_id"));
-        subject.setTeacherName(resultSet.getString("teacherName"));
+        if (hasTeacherName) {
+            subject.setTeacherName(resultSet.getString("teacherName"));
+        }
         return subject;
     }
 
@@ -98,7 +100,25 @@ public class SubjectDao extends BaseDao {
             preparedStatement = connection.prepareStatement(sql);
             preparedStatement.setString(1, name);
             resultSet = preparedStatement.executeQuery();
-            if (resultSet.next()) subject = getOneSubjectByResultSet(resultSet);
+            if (resultSet.next()) subject = getOneSubjectByResultSet(resultSet, false);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            closeHelper();
+            return subject;
+        }
+    }
+
+    public Subject getSubjectById(int subjectId) {
+        if (subjectId <= 0) return null;
+        Subject subject = null;
+        try {
+            connection = DriverManager.getConnection(URL + EXTRA_PARAMETER, USERNAME, PASSWORD);
+            String sql = "select * from " + TABLE_NAME + " where id=?";
+            preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setInt(1, subjectId);
+            resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) subject = getOneSubjectByResultSet(resultSet , false);
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
