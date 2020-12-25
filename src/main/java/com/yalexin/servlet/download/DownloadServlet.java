@@ -16,14 +16,15 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 
-@WebServlet(urlPatterns = {"/download.te", "/getAllProgresses.te", "/getAllProgresses.st"})
+@WebServlet(urlPatterns = {"/download.user", "/getAllProgresses.te", "/getAllProgresses.st"})
 public class DownloadServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String servletPath = req.getServletPath();
-        if (servletPath.contains("/download.te")) {
+        if (servletPath.contains("/download.user")) {
             downloadProgress(req, resp);
         }else if (servletPath.contains("/getAllProgresses.te")){
             getAllProgressesByTeacher(req, resp);
@@ -65,6 +66,7 @@ public class DownloadServlet extends HttpServlet {
     private void downloadProgress(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         BufferedReader reader = req.getReader();
         String jsonString = reader.readLine();
+        System.out.println("jsonString = " + jsonString);
         JSONObject jo = JSON.parseObject(jsonString);
         JSONObject data = jo.getJSONObject("data");
 
@@ -74,9 +76,9 @@ public class DownloadServlet extends HttpServlet {
 
     private void downloadChineseFileByOutputStream(HttpServletResponse response, String filename)
             throws FileNotFoundException, IOException {
+        response.setHeader("conten-type", "application/octet-stream");
+        response.setHeader("content-disposition", "attachment;filename=" + URLEncoder.encode(filename));
         String realPath = Constants.FILE_PATH + "/" + filename;
-        //设置content-disposition响应头控制浏览器以下载的形式打开文件，中文文件名要使用URLEncoder.encode方法进行编码，否则会出现文件名乱码
-//        response.setHeader("content-disposition", "attachment;filename=" + URLEncoder.encode(fileName, "UTF-8"));
         InputStream in = new FileInputStream(realPath);//获取文件输入流
         int len = 0;
         byte[] buffer = new byte[1024];
