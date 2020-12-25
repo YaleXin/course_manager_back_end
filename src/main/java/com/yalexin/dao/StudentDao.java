@@ -107,4 +107,28 @@ public class StudentDao extends BaseDao {
         return students;
     }
 
+
+    public ArrayList<Student> getAllHasNoTeamStudentsAsList(){
+        ArrayList<Student> students = new ArrayList<>();
+        int updateResult = 0;
+        try {
+            connection = DriverManager.getConnection(URL + EXTRA_PARAMETER, USERNAME, PASSWORD);
+            String sql = "SELECT * FROM student WHERE id not in (\n" +
+                    "SELECT captain as stu from team\n" +
+                    "UNION\n" +
+                    "SELECT member1 as stu from team WHERE member1 is not null\n" +
+                    "UNION \n" +
+                    "SELECT member2 as stu from team WHERE member2 is not null\n" +
+                    ")";
+            preparedStatement = connection.prepareStatement(sql);
+            resultSet = preparedStatement.executeQuery();
+            while (resultSet.next())students.add(getOneStudentByResultSet(resultSet));
+        } catch (SQLException sqlException) {
+            sqlException.printStackTrace();
+        }finally {
+            closeHelper();
+        }
+        return students;
+    }
+
 }

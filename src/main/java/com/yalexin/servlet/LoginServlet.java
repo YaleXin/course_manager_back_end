@@ -59,16 +59,19 @@ public class LoginServlet extends HttpServlet {
                 System.out.println("学生已登陆");
                 Student s = (Student) student;
                 respData.put("logined", true);
-                respData.put("user", s);
 
                 TeamDao teamDao = new TeamDao();
                 Team team = teamDao.getTeamByOneStudnet(s.getId());
                 if (team != null) {
+                    s.setTeam(team);
+                    session.removeAttribute("student");
+                    session.setAttribute("student", s);
                     respData.put("hasTeam", true);
                     respData.put("team", team);
                 }else {
                     respData.put("hasTeam", false);
                 }
+                respData.put("user", s);
             }
             resp.getWriter().println(respData);
         }

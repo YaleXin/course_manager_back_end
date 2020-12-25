@@ -183,10 +183,11 @@ public class TeamDao extends BaseDao {
         Team team = null;
         try {
             connection = DriverManager.getConnection(URL + EXTRA_PARAMETER, USERNAME, PASSWORD);
-            String sql = "select * from " + TABLE_NAME + "where captain=?";
+            String sql = "select * from " + TABLE_NAME + " where captain=?";
             preparedStatement = connection.prepareStatement(sql);
             preparedStatement.setInt(1, captainId);
             resultSet = preparedStatement.executeQuery();
+            System.out.println("getTeamByCaptainId preparedStatement = " + preparedStatement);
             if (resultSet.next()){
                 team = getOneTeamByResultSet(resultSet);
                 setTeam(team);

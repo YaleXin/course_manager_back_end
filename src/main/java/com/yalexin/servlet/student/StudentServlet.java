@@ -23,7 +23,7 @@ import java.io.IOException;
 import java.sql.Date;
 import java.util.ArrayList;
 
-@WebServlet(urlPatterns = {"/modifyStudent.st", "/getAllStudents.st"})
+@WebServlet(urlPatterns = {"/modifyStudent.st", "/getAllHasNoTeamStudents.st"})
 public class StudentServlet extends HttpServlet {
 
 
@@ -38,16 +38,16 @@ public class StudentServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String servletPath = req.getServletPath();
-        if (servletPath.contains("/getAllStudents.st")) {
-            getAllStudents(req, resp);
+        if (servletPath.contains("/getAllHasNoTeamStudents.st")) {
+            getAllHasNoTeamStudents(req, resp);
         }
     }
 
-    private void getAllStudents(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+    private void getAllHasNoTeamStudents(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         JSONArray students = new JSONArray();
         JSONObject respData = new JSONObject();
         StudentDao studentDao = new StudentDao();
-        ArrayList<Student> allStudentsAsList = studentDao.getAllStudentsAsList();
+        ArrayList<Student> allStudentsAsList = studentDao.getAllHasNoTeamStudentsAsList();
         for (Student s : allStudentsAsList) {
             s.setPassword("");
             students.add(s);

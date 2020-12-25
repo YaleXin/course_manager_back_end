@@ -16,6 +16,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.BufferedReader;
 import java.io.IOException;
 
@@ -55,10 +56,14 @@ public class TeamServlet extends HttpServlet {
         int result = teamDao.addTeadByCaptain(captain, members, subject);
         JSONObject respData = new JSONObject();
         if (result > 0) {
+            HttpSession session = req.getSession();
             Team teamByCaptainId = teamDao.getTeamByCaptainId(captain);
-            Student student = (Student) req.getSession().getAttribute("student");
+            Student student = (Student) session.getAttribute("student");
             student.setTeam(teamByCaptainId);
-            req.getSession().setAttribute("student", student);
+            if(teamByCaptainId != null){
+                session.removeAttribute("student");
+                session.setAttribute("student", student);
+            }
             respData.put("addSuccess", true);
         } else {
             respData.put("addSuccess", false);
