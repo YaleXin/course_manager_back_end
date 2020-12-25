@@ -148,7 +148,7 @@ public class TeacherServlet extends HttpServlet {
 
         int teacherId = data.getIntValue("teacherId");
         TeamDao teamDao = new TeamDao();
-        ArrayList<Team> teams = teamDao.getTeamsByTeacherId(teacherId);
+        ArrayList<Team> teams = teamDao.getNotApprovedTeamsByTeacherId(teacherId);
 
         JSONObject respData = new JSONObject();
         respData.put("notApprovedTeams", teams);

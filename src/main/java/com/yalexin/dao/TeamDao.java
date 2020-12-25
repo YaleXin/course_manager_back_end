@@ -178,8 +178,28 @@ public class TeamDao extends BaseDao {
         }
     }
 
+    public Team getTeamByCaptainId(int captainId){
+        if (captainId <= 0)return null;
+        Team team = null;
+        try {
+            connection = DriverManager.getConnection(URL + EXTRA_PARAMETER, USERNAME, PASSWORD);
+            String sql = "select * from " + TABLE_NAME + "where captain=?";
+            preparedStatement = connection.prepareStatement(sql);
+            preparedStatement.setInt(1, captainId);
+            resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()){
+                team = getOneTeamByResultSet(resultSet);
+                setTeam(team);
+            }
+        }catch (SQLException e){
+            e.printStackTrace();
+        }finally {
+            closeHelper();
+        }
+        return null;
+    }
 
-    public ArrayList<Team> getTeamsByTeacherId(int teacherId) {
+    public ArrayList<Team> getNotApprovedTeamsByTeacherId(int teacherId) {
         if (teacherId <= 0) return null;
         ArrayList<Team> teams = new ArrayList<>();
         try {
@@ -189,8 +209,8 @@ public class TeamDao extends BaseDao {
             preparedStatement = connection.prepareStatement(sql);
             preparedStatement.setInt(1, teacherId);
             resultSet = preparedStatement.executeQuery();
+            System.out.println("待审核的团队 " + preparedStatement);
             while (resultSet.next()) {
-
                 Team team = getOneTeamByResultSet(resultSet);
                 team.setSubName(resultSet.getString("subName"));
                 setTeam(team);

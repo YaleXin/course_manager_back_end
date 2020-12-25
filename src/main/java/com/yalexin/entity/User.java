@@ -11,6 +11,20 @@ public class User {
     private String username;
     private String password;
     private String role;
+    private Team team;
+
+    public void setRole(String role) {
+        this.role = role;
+    }
+
+    public Team getTeam() {
+        return team;
+    }
+
+    public void setTeam(Team team) {
+        this.team = team;
+    }
+
     public int getId() {
         return id;
     }

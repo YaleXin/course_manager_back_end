@@ -52,7 +52,7 @@ public class LoginServlet extends HttpServlet {
                     respData.put("user", t);
 
                     TeamDao teamDao = new TeamDao();
-                    ArrayList<Team> teams = teamDao.getTeamsByTeacherId(t.getId());
+                    ArrayList<Team> teams = teamDao.getNotApprovedTeamsByTeacherId(t.getId());
                     respData.put("notApprovedTeams", teams);
                 }
             } else {
@@ -150,7 +150,7 @@ public class LoginServlet extends HttpServlet {
             req.getSession().removeAttribute("student");
 
             TeamDao teamDao = new TeamDao();
-            ArrayList<Team> teams = teamDao.getTeamsByTeacherId(teacherById.getId());
+            ArrayList<Team> teams = teamDao.getNotApprovedTeamsByTeacherId(teacherById.getId());
             respData.put("notApprovedTeams", teams);
 
             JSONObject userParameter = new JSONObject();
@@ -193,21 +193,17 @@ public class LoginServlet extends HttpServlet {
         } else {
             respData.put("loginSuccess", true);
             studentById.setPassword("");
-            respData.put("user", studentById);
+
+            TeamDao teamDao = new TeamDao();
+            Team team = teamDao.getTeamByOneStudnet(studentById.getId());
+            studentById.setTeam(team);
+
             req.getSession().setAttribute("student", studentById);
+            respData.put("user", studentById);
             req.getSession().removeAttribute("teacher");
             JSONObject userParameter = new JSONObject();
             userParameter.put("role", "student");
             respData.put("userParameter", userParameter);
-
-            TeamDao teamDao = new TeamDao();
-            Team team = teamDao.getTeamByOneStudnet(studentById.getId());
-            if (team != null) {
-                respData.put("hasTeam", true);
-                respData.put("team", team);
-            }else {
-                respData.put("hasTeam", false);
-            }
         }
         System.out.println("学生请求登陆 返回的数据 :");
         System.out.println(respData);

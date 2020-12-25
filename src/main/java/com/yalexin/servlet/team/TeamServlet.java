@@ -8,6 +8,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.yalexin.dao.TeamDao;
+import com.yalexin.entity.Student;
 import com.yalexin.entity.Team;
 
 import javax.servlet.ServletException;
@@ -54,6 +55,10 @@ public class TeamServlet extends HttpServlet {
         int result = teamDao.addTeadByCaptain(captain, members, subject);
         JSONObject respData = new JSONObject();
         if (result > 0) {
+            Team teamByCaptainId = teamDao.getTeamByCaptainId(captain);
+            Student student = (Student) req.getSession().getAttribute("student");
+            student.setTeam(teamByCaptainId);
+            req.getSession().setAttribute("student", student);
             respData.put("addSuccess", true);
         } else {
             respData.put("addSuccess", false);
